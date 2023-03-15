@@ -13,9 +13,8 @@ public class AppDbContext : DbContext
     private readonly bool _enableLogging;
     private readonly string _logFileName;
 
-    //private const string ConnectionString 
-    //= @"Data Source=C:\Users\rodio\RiderProjects\EntityFrameworkCourse2022\AttendanceManagerEf\att.db";
-    private const string ConnectionString = @"Host=localhost;Database=my_db;Username=my_db;Password=coolpass";
+    private const string ConnectionString = @"Data Source=C:\Users\rodio\RiderProjects\itstep\EntityFrameworkCourse2022\SimpleJournal\att.db";
+    //private const string ConnectionString = @"Host=localhost;Database=my_db;Username=my_db;Password=coolpass";
 
     public AppDbContext(bool enableLogging = true, string? logFileName = null)
     {
@@ -26,7 +25,7 @@ public class AppDbContext : DbContext
     protected override void OnConfiguring(
         DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql(ConnectionString);
+        optionsBuilder.UseSqlite(ConnectionString);
         if (_enableLogging)
         {
             optionsBuilder.LogTo(line =>
@@ -54,6 +53,15 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Visit>()
             .HasOne(visit => visit.Student)
             .WithMany(student => student.Visits);
+        
+        // Fluent-настройка индексов
+        modelBuilder.Entity<Student>()
+            .HasIndex(it => it.Name);
+        
+        modelBuilder.Entity<Visit>()
+            .Navigation(e => e.Student)
+            .AutoInclude();
+        
         //Для VO:
          // modelBuilder.Entity<Student>()
          //     .OwnsOne(s => s.Phone, 

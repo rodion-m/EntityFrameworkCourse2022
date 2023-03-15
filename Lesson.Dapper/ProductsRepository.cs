@@ -23,8 +23,8 @@ public class ProductsRepository : IDisposable
 
     public async Task AddProductsAsync(IEnumerable<Product> products)
     {
-        var sql = @"insert into products (ProductId, ProductName, Price) 
-                    values (@ProductId, @ProductName, @Price)";
+        var sql = @"insert into products (Id, Name, Price) 
+                    values (@Id, @Name, @Price)";
         await _connection.QueryAsync<Product>(sql, products);
     }
 
@@ -36,8 +36,8 @@ public class ProductsRepository : IDisposable
         var products = await repository.GetProductsAsync();
         await repository.AddProductsAsync(new[]
         {
-            new Product(), 
-            new Product() { ProductName = "Пицца" }
+            new Product(1, "Салат", 100), 
+            new Product(2, "Пицца", 200)
         });
     }
     

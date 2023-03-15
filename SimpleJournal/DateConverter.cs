@@ -8,11 +8,11 @@ namespace SimpleJournal;
 [ValueConversion(typeof(DateOnly), typeof(string))]
 public class DateConverter : IValueConverter
 {
-    private static readonly CultureInfo s_ru = new("ru-RU");
+    private static readonly CultureInfo Ru = new("ru-RU");
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var date = (DateOnly)value;
-        return date.ToString(s_ru);
+        return date.ToString(Ru);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -20,7 +20,7 @@ public class DateConverter : IValueConverter
         var strValue = (string) value;
         if (DateOnly.TryParse(
                 strValue, 
-                s_ru, 
+                Ru, 
                 DateTimeStyles.AllowWhiteSpaces, 
                 out DateOnly resultDateTime))
         {

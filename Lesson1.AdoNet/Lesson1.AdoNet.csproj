@@ -13,4 +13,8 @@
       <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Lesson.Dapper\Lesson.Dapper.csproj" />
+    </ItemGroup>
+
 </Project>

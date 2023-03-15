@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SimpleJournal;
 
 #nullable disable
@@ -12,39 +11,35 @@ using SimpleJournal;
 namespace SimpleJournal.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220909003939_AddingCoursesTable")]
-    partial class AddingCoursesTable
+    [Migration("20230301123012_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("SimpleJournal.Course", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Course", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("FinishedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("GroupId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid?>("SubjectId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -55,50 +50,48 @@ namespace SimpleJournal.Migrations
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Group", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Group", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("OnlyFullTimeEducation")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Student", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Student", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("Birthday")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("EducationCost")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("GroupId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsFullTimeEducation")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsStateFunded")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -107,35 +100,35 @@ namespace SimpleJournal.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Subject", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Subject", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Subjects");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Visit", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Visit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("SubjectId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -146,13 +139,13 @@ namespace SimpleJournal.Migrations
                     b.ToTable("Visits");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Course", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Course", b =>
                 {
-                    b.HasOne("SimpleJournal.Group", "Group")
+                    b.HasOne("SimpleJournal.Entities.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");
 
-                    b.HasOne("SimpleJournal.Subject", "Subject")
+                    b.HasOne("SimpleJournal.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
 
@@ -161,24 +154,43 @@ namespace SimpleJournal.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Student", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Student", b =>
                 {
-                    b.HasOne("SimpleJournal.Group", "Group")
+                    b.HasOne("SimpleJournal.Entities.Group", "Group")
                         .WithMany("Students")
                         .HasForeignKey("GroupId");
 
+                    b.OwnsOne("SimpleJournal.ValueObjects.Phone", "Phone", b1 =>
+                        {
+                            b1.Property<Guid>("StudentId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("StudentId");
+
+                            b1.ToTable("Students");
+
+                            b1.WithOwner()
+                                .HasForeignKey("StudentId");
+                        });
+
                     b.Navigation("Group");
+
+                    b.Navigation("Phone");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Visit", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Visit", b =>
                 {
-                    b.HasOne("SimpleJournal.Student", "Student")
+                    b.HasOne("SimpleJournal.Entities.Student", "Student")
                         .WithMany("Visits")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SimpleJournal.Subject", "Subject")
+                    b.HasOne("SimpleJournal.Entities.Subject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -189,12 +201,12 @@ namespace SimpleJournal.Migrations
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Group", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Group", b =>
                 {
                     b.Navigation("Students");
                 });
 
-            modelBuilder.Entity("SimpleJournal.Student", b =>
+            modelBuilder.Entity("SimpleJournal.Entities.Student", b =>
                 {
                     b.Navigation("Visits");
                 });

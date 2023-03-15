@@ -23,7 +23,6 @@ using (IDbConnection connection = new SqliteConnection(connectionString))
         FROM users
         WHERE id = {id}
     ";
-    
     using (IDataReader reader = command.ExecuteReader())
     {
         while (reader.Read())
